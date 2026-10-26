@@ -1,0 +1,44 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "Task Management API using Express.js and MongoDB with Mongoose",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "npm --prefix client run build",
+    "client": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
+    "test:p9": "node test-practical9.js",
+    "test:p10": "node test-practical10.js",
+    "test:p11": "node test-practical11.js",
+    "test": "jest --runInBand"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "mongodb",
+    "mongoose",
+    "api",
+    "task-manager"
+  ],
+  "author": "Aneri Patel (24AIML031)",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.31.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "google-auth-library": "^11.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.24.3",
+    "node-cache": "^5.1.2",
+    "nodemailer": "^10.0.10",
+    "pdfkit": "^0.19.1"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.3.1"
+  }
+}

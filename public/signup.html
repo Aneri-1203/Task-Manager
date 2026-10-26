@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account - Task Management System</title>
+
+    <!-- Font Awesome -->
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Main CSS -->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+
+
+<body class="auth-page">
+
+    <!-- ==================================================
+         Header
+    ================================================== -->
+
+    <header class="header">
+        <div>
+            <h1>
+                <i class="fa-solid fa-list-check"></i>
+                Task Management System
+            </h1>
+            <p>
+                Manage your daily tasks easily
+            </p>
+        </div>
+    </header>
+
+    <!-- ==================================================
+         Authentication Container
+    ================================================== -->
+
+    <div class="auth-container">
+
+
+
+        <!-- ==================================================
+             Signup Card
+        ================================================== -->
+
+        <div class="auth-card">
+
+
+            <!-- Logo -->
+
+            <div class="auth-logo">
+
+                <i class="fa-solid fa-list-check"></i>
+
+            </div>
+
+
+            <!-- Heading -->
+
+            <h1>
+                Create Account
+            </h1>
+
+
+            <p class="auth-subtitle">
+
+                Start managing your tasks today
+
+            </p>
+
+
+
+            <!-- ==================================================
+                 Signup Form
+            ================================================== -->
+
+            <form
+                id="signupForm"
+                onsubmit="registerUser(event)"
+            >
+
+
+                <!-- ==================================================
+                     Username
+                ================================================== -->
+
+                <div class="input-group">
+
+                    <label for="username">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        Username
+
+                    </label>
+
+
+                    <div class="input-wrapper">
+
+                        <i
+                            class="fa-solid fa-user input-icon"
+                        ></i>
+
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Enter username"
+                            minlength="3"
+                            maxlength="30"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     Email
+                ================================================== -->
+
+                <div class="input-group">
+
+                    <label for="email">
+
+                        <i
+                            class="fa-solid fa-envelope"
+                        ></i>
+
+                        Email
+
+                    </label>
+
+
+                    <div class="input-wrapper">
+
+                        <i
+                            class="fa-solid fa-envelope input-icon"
+                        ></i>
+
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter your email"
+                            autocomplete="email"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     Password
+                ================================================== -->
+
+                <div class="input-group">
+
+                    <label for="password">
+
+                        <i
+                            class="fa-solid fa-lock"
+                        ></i>
+
+                        Password
+
+                    </label>
+
+
+                    <div class="input-wrapper">
+
+                        <i
+                            class="fa-solid fa-lock input-icon"
+                        ></i>
+
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            minlength="6"
+                            autocomplete="new-password"
+                            required
+                        >
+
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="toggleSignupPassword()"
+                            aria-label="Show password"
+                        >
+
+                            <i
+                                id="passwordIcon"
+                                class="fa-solid fa-eye"
+                            ></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     Confirm Password
+                ================================================== -->
+
+                <div class="input-group">
+
+                    <label for="confirmPassword">
+
+                        <i
+                            class="fa-solid fa-lock"
+                        ></i>
+
+                        Confirm Password
+
+                    </label>
+
+
+                    <div class="input-wrapper">
+
+                        <i
+                            class="fa-solid fa-lock input-icon"
+                        ></i>
+
+
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="Confirm your password"
+                            minlength="6"
+                            autocomplete="new-password"
+                            required
+                        >
+
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="toggleConfirmPassword()"
+                            aria-label="Show confirm password"
+                        >
+
+                            <i
+                                id="confirmPasswordIcon"
+                                class="fa-solid fa-eye"
+                            ></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     Account Role (Employee / Manager / Admin)
+                ================================================== -->
+
+                <div class="input-group">
+
+                    <label for="role">
+
+                        <i class="fa-solid fa-user-shield"></i>
+
+                        Account Role
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i class="fa-solid fa-user-shield input-icon"></i>
+
+                        <select
+                            id="role"
+                            name="role"
+                            style="width: 100%; padding: 12px 14px 12px 42px; border: 1.5px solid #e2e8f0; border-radius: 10px; background: white; font-size: 14px; color: #1e293b; font-weight: 500;"
+                        >
+                            <option value="employee" selected>Employee (View assigned tasks & add own tasks)</option>
+                            <option value="manager">Manager (Assign tasks to employees & own tasks)</option>
+                            <option value="admin">Administrator (Assign tasks to any user & full access)</option>
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     Error Message
+                ================================================== -->
+
+                <div
+                    id="signupError"
+                    class="auth-error"
+                ></div>
+
+
+
+                <!-- ==================================================
+                     Success Message
+                ================================================== -->
+
+                <div
+                    id="signupSuccess"
+                    class="auth-success"
+                ></div>
+
+
+
+                <!-- ==================================================
+                     Create Account Button
+                ================================================== -->
+
+                <button
+                    type="submit"
+                    id="signupButton"
+                    class="auth-button"
+                >
+
+                    <i class="fa-solid fa-user-plus"></i>
+
+                    Create Account
+
+                </button>
+
+
+            </form>
+
+
+
+            <!-- ==================================================
+                     Divider
+            ================================================== -->
+
+            <div class="auth-divider">
+
+                <span>OR</span>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 Google Signup
+            ================================================== -->
+
+            <div id="googleBtnContainer" style="display:flex; justify-content:center; width:100%; min-height:44px; margin-bottom: 10px;"></div>
+
+            <button
+                type="button"
+                id="customGoogleBtn"
+                class="google-button"
+                onclick="triggerGoogleSignup(event)"
+                style="cursor: pointer;"
+            >
+                <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right: 8px; vertical-align: middle;">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Sign up with Google
+            </button>
+
+
+
+
+            <!-- ==================================================
+                 Login Link
+            ================================================== -->
+
+            <p class="auth-switch">
+
+                Already have an account?
+
+                <a href="login.html">
+
+                    Login
+
+                </a>
+
+            </p>
+
+
+
+            <!-- ==================================================
+                 Back to Home
+            ================================================== -->
+
+            <div class="back-home">
+
+                <a href="/">
+
+                    <i
+                        class="fa-solid fa-arrow-left"
+                    ></i>
+
+                    Back to Home
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- ==================================================
+             Footer
+        ================================================== -->
+
+        <div class="auth-footer">
+
+            <p>
+
+                <i
+                    class="fa-solid fa-shield-halved"
+                ></i>
+
+                Your account is securely protected
+
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- Signup JavaScript -->
+
+    <script src="signup.js"></script>
+
+</body>
+
+</html>

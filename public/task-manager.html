@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Task Management System</title>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Immediate Auth Guard -->
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.replace("/login.html");
+        }
+    </script>
+</head>
+
+<body class="task-page">
+
+    <!-- ==================================================
+         Header
+    ================================================== -->
+    <header class="header">
+        <div>
+            <h1>
+                <i class="fa-solid fa-list-check"></i>
+                Task Management System
+            </h1>
+            <p id="headerSubtitle">Manage and track your project tasks easily</p>
+        </div>
+
+        <!-- User Section & Session Management -->
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <strong id="usernameDisplay">User</strong>
+                        <span id="roleBadge" class="role-badge role-user">USER</span>
+                    </div>
+                    <small id="emailDisplay">user@email.com</small>
+                </div>
+            </div>
+
+            <!-- Session Status Badge -->
+            <div class="session-badge" title="Session active (auto-expires on inactivity)">
+                <i class="fa-solid fa-circle" style="color: #4ade80; font-size: 8px;"></i>
+                <span id="sessionTimerText">Active</span>
+            </div>
+
+            <button class="logout-btn" onclick="logoutUser()" title="Sign out securely">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Admin Role Indicator Banner (Visible only for Admin) -->
+    <div id="adminBanner" class="admin-notice-bar" style="display: none;">
+        <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+            <span><i class="fa-solid fa-shield-halved"></i> <strong>Admin Portal Mode:</strong> You have elevated privileges including Date-Range Report Generation and Organization Oversight.</span>
+            <span class="badge" style="background: #ffffff; color: #b91c1c; font-weight: 700;">ADMIN VIEW</span>
+        </div>
+    </div>
+
+    <!-- ==================================================
+         Main Container
+    ================================================== -->
+    <main class="container">
+
+        <!-- ==================================================
+             ADMIN ONLY: Date-Range Report Generation Card
+        ================================================== -->
+        <div id="adminReportCard" class="card admin-report-card" style="display: none;">
+            <div class="section-header">
+                <div>
+                    <h2>
+                        <i class="fa-solid fa-file-waveform" style="color: #6366f1;"></i>
+                        Date-Range Report Generation <span class="badge role-admin" style="font-size: 11px; margin-left: 8px;">ADMIN ONLY</span>
+                    </h2>
+                    <p>Filter tasks between specific dates and generate executive PDF reports</p>
+                </div>
+            </div>
+
+            <form id="reportForm" onsubmit="generateDateFilteredReport(event)" class="report-form-grid">
+                <div class="form-group">
+                    <label for="reportStartDate"><i class="fa-regular fa-calendar"></i> From Date</label>
+                    <input type="date" id="reportStartDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="reportEndDate"><i class="fa-regular fa-calendar"></i> To Date</label>
+                    <input type="date" id="reportEndDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="reportStatus"><i class="fa-solid fa-filter"></i> Status Filter</label>
+                    <select id="reportStatus">
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending Only</option>
+                        <option value="in-progress">In Progress Only</option>
+                        <option value="completed">Completed Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportAllUsers"><i class="fa-solid fa-users-gear"></i> Scope</label>
+                    <select id="reportAllUsers">
+                        <option value="true" selected>All Users' Tasks (System-wide)</option>
+                        <option value="false">Admin's Tasks Only</option>
+                    </select>
+                </div>
+
+                <div class="report-form-actions">
+                    <button type="submit" class="download-btn-primary" id="generateReportBtn">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Generate & Download Date-Range PDF
+                    </button>
+                    <button type="button" class="quick-preset-btn" onclick="setDatePreset('month')">
+                        This Month
+                    </button>
+                    <button type="button" class="quick-preset-btn" onclick="setDatePreset('all')">
+                        All Time
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ==================================================
+             Add Task Card
+        ================================================== -->
+        <div class="card">
+            <div class="section-header">
+                <div>
+                    <h2>
+                        <i class="fa-solid fa-plus-circle"></i>
+                        Add New Task
+                    </h2>
+                    <p>Create a task to track in your workflow</p>
+                </div>
+            </div>
+
+            <form id="taskForm" onsubmit="addTask(event)">
+                <!-- Task Title -->
+                <div class="form-group">
+                    <label for="title">Task Title <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="title" placeholder="e.g. Implement user authentication module" required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description">Description (optional)</label>
+                    <textarea id="description" rows="2" placeholder="Briefly describe the task objectives..."></textarea>
+                </div>
+
+                <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <!-- Priority -->
+                    <div class="form-group" style="flex: 1; min-width: 200px;">
+                        <label for="priority">Priority</label>
+                        <select id="priority">
+                            <option value="low">Low Priority</option>
+                            <option value="medium" selected>Medium Priority</option>
+                            <option value="high">High Priority</option>
+                        </select>
+                    </div>
+
+                    <!-- Initial Status -->
+                    <div class="form-group" style="flex: 2; min-width: 280px;">
+                        <label>Initial Status</label>
+                        <div class="status-options">
+                            <label class="status-option">
+                                <input type="radio" name="status" value="pending" checked>
+                                <span><i class="fa-regular fa-clock"></i> Pending</span>
+                            </label>
+
+                            <label class="status-option">
+                                <input type="radio" name="status" value="in-progress">
+                                <span><i class="fa-solid fa-spinner"></i> In Progress</span>
+                            </label>
+
+                            <label class="status-option">
+                                <input type="radio" name="status" value="completed">
+                                <span><i class="fa-solid fa-check"></i> Completed</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="add-btn" id="addTaskButton">
+                        <i class="fa-solid fa-plus"></i>
+                        Add Task
+                    </button>
+                    <button type="button" class="refresh-btn" onclick="loadTasks()">
+                        <i class="fa-solid fa-rotate"></i>
+                        Refresh
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ==================================================
+             Task Status Navigation Tabs
+        ================================================== -->
+        <div class="card status-card">
+            <div class="status-tabs">
+                <button type="button" class="status-tab active" data-status="pending" onclick="showStatusTasks('pending')">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Pending</span>
+                    <span class="status-count" id="pendingCount">0</span>
+                </button>
+
+                <button type="button" class="status-tab" data-status="in-progress" onclick="showStatusTasks('in-progress')">
+                    <i class="fa-solid fa-spinner"></i>
+                    <span>In Progress</span>
+                    <span class="status-count" id="inProgressCount">0</span>
+                </button>
+
+                <button type="button" class="status-tab" data-status="completed" onclick="showStatusTasks('completed')">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Completed</span>
+                    <span class="status-count" id="completedCount">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================================================
+             Task Table Card
+        ================================================== -->
+        <div class="card table-card">
+            <div class="task-list-header">
+                <div>
+                    <h2 id="currentStatusTitle">
+                        <i class="fa-regular fa-clock"></i>
+                        Pending Tasks
+                    </h2>
+                    <p id="taskListDescription">Tasks that are waiting to be started</p>
+                </div>
+
+                <!-- Quick Download for Current Tab -->
+                <button type="button" class="download-btn" onclick="downloadCurrentStatusPDF()">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Download PDF
+                </button>
+            </div>
+
+            <!-- Workflow Segregation Notice -->
+            <div class="workflow-info-banner">
+                <i class="fa-solid fa-circle-info"></i>
+                <span><strong>Workflow Rule:</strong> Forward progression only (<code>Pending &rarr; In Progress &rarr; Completed</code>). Tasks cannot be reversed. Completed tasks trigger an automatic email notification.</span>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Task</th>
+                            <th>Description</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th id="userColumnHeader" style="display: none;">Assigned User</th>
+                            <th>Created</th>
+                            <th>Workflow Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ==================================================
+             Footer
+        ================================================== -->
+        <footer class="footer">
+            <p>
+                <i class="fa-solid fa-code"></i>
+                Task Management System &bull; Node.js, Express.js, MongoDB & JavaScript
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- JavaScript -->
+    <script src="task-manager.js"></script>
+
+</body>
+
+</html>

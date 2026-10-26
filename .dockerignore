@@ -1,0 +1,32 @@
+# ============================================================================
+# .dockerignore - Root / Backend Build Context Exclusions
+# Practical 11 Supplementary Problem: Exclude node_modules and .env
+# ============================================================================
+
+# Dependencies (MUST be installed fresh inside Linux container)
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sensitive Environment Variables (Supplied dynamically via docker-compose)
+.env
+.env.*
+!.env.example
+
+# Client / Frontend context (has its own build context)
+client/node_modules
+client/dist
+
+# Version Control & IDE
+.git
+.gitignore
+.vscode
+.idea
+
+# Temporary, Test, & Documentation Files
+logs
+*.log
+PRACTICAL_*.md
+test-*.js
+scratch

@@ -1,0 +1,24 @@
+# ============================================================================
+# .dockerignore - Client / Frontend Build Context Exclusions
+# Practical 11 Supplementary Problem: Exclude node_modules and .env
+# ============================================================================
+
+# Dependencies (MUST be installed fresh inside container)
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Version Control & IDE
+.git
+.gitignore
+.vscode
+.idea
