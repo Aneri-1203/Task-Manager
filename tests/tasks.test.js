@@ -105,7 +105,7 @@ describe("Task Management API - CI/CD Automated Test Suite", () => {
 
             // To deliberately fail this test for demonstration:
             // Change 200 below to 201 or 500 (e.g., expect(res.statusCode).toBe(201))
-            expect(res.statusCode).toBe(200);
+            expect(res.statusCode).toBe(201);
             expect(res.body).toHaveProperty("success", true);
             expect(Array.isArray(res.body.data)).toBe(true);
             expect(res.body.count).toBe(1);
