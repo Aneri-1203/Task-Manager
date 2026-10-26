@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: "Times New Roman", serif; font-size: 12pt; margin: 2.5cm; line-height: 1.5; color: #000; }
+  h1 { font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 4pt; }
+  h2 { font-size: 14pt; font-weight: bold; margin-top: 18pt; margin-bottom: 6pt; }
+  h3 { font-size: 12pt; font-weight: bold; margin-top: 14pt; margin-bottom: 4pt; }
+  .center { text-align: center; }
+  .header-block { text-align: center; margin-bottom: 20pt; border-bottom: 2px solid #000; padding-bottom: 10pt; }
+  table { width: 100%; border-collapse: collapse; margin: 10pt 0; }
+  td, th { border: 1px solid #000; padding: 6pt 8pt; font-size: 11pt; }
+  th { background: #e0e0e0; font-weight: bold; }
+  pre, code { font-family: Consolas, monospace; font-size: 10pt; background: #f4f4f4; padding: 8pt; display: block; border: 1px solid #ccc; white-space: pre-wrap; }
+  .placeholder { background: #fffde7; border: 2px dashed #f9a825; padding: 10pt; text-align: center; font-style: italic; color: #555; margin: 12pt 0; }
+  p { margin: 6pt 0; }
+  ul, ol { margin: 6pt 0 6pt 20pt; }
+  li { margin-bottom: 4pt; }
+</style>
+</head>
+<body>
+
+<div class="header-block">
+  <h1>CHAROTAR UNIVERSITY OF SCIENCE AND TECHNOLOGY</h1>
+  <p><strong>FACULTY OF TECHNOLOGY AND ENGINEERING</strong></p>
+  <p><strong>B. TECH (IT/CE/CSE/AIML)</strong></p>
+  <br>
+  <table style="width:70%; margin:0 auto; border:none;">
+    <tr><td style="border:none;"><strong>Student Name:</strong></td><td style="border:none;">Aneri Patel</td></tr>
+    <tr><td style="border:none;"><strong>Student ID:</strong></td><td style="border:none;">24AIML031</td></tr>
+    <tr><td style="border:none;"><strong>Subject:</strong></td><td style="border:none;">Advanced Web Development Frameworks (ITUE301)</td></tr>
+    <tr><td style="border:none;"><strong>Semester:</strong></td><td style="border:none;">5th</td></tr>
+  </table>
+</div>
+
+<h1>Practical 12: CI/CD Pipeline with GitHub Actions</h1>
+<h2>Practical Statement</h2>
+<ul>
+  <li>Implement a Continuous Integration (CI) pipeline using GitHub Actions for the Task Manager application.</li>
+  <li>The pipeline must automatically run on every push and pull request to the main branch.</li>
+  <li>It must install dependencies, run automated tests, and verify the production build.</li>
+  <li>Demonstrate a deliberate pipeline failure followed by a successful green run.</li>
+  <li>All tests must be meaningful and test actual application functionality.</li>
+</ul>
+
+<h2>1. GitHub Actions Workflow Configuration</h2>
+<p>The CI pipeline is defined in <strong>.github/workflows/ci.yml</strong>. It runs two parallel jobs: backend tests and frontend build verification.</p>
+
+<h3>Workflow File: .github/workflows/ci.yml</h3>
+<pre>
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Set up Node.js runtime (v20.x LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      - name: Install backend dependencies
+        run: npm install
+      - name: Execute automated Jest &amp; Supertest API tests
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci_test_jwt_secret_key_98765
+        run: npm test
+
+  build-frontend:
+    name: Frontend Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Set up Node.js runtime (v20.x LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - name: Install client dependencies
+        working-directory: client
+        run: npm install
+      - name: Verify React/Vite production build
+        working-directory: client
+        run: npm run build
+</pre>
+
+<h2>2. Automated Test Suite</h2>
+<p>The project uses <strong>Jest</strong> and <strong>Supertest</strong> for API integration testing. Tests are located in <code>tests/tasks.test.js</code> and <code>tests/ai.test.js</code>. All Mongoose models are mocked so tests run without a live database.</p>
+
+<h3>Test Coverage (tasks.test.js)</h3>
+<table>
+  <tr><th>#</th><th>Test Description</th><th>Expected HTTP Status</th></tr>
+  <tr><td>1</td><td>GET /tasks — rejects unauthenticated request</td><td>401</td></tr>
+  <tr><td>2</td><td>GET /tasks — returns task list for authenticated user</td><td>200</td></tr>
+  <tr><td>3</td><td>GET /tasks?userId=... — filter by individual user</td><td>200</td></tr>
+  <tr><td>4</td><td>GET /tasks?self=true — filter for own tasks</td><td>200</td></tr>
+  <tr><td>5</td><td>POST /tasks — creates task with valid payload</td><td>201</td></tr>
+  <tr><td>6</td><td>POST /tasks — rejects missing title</td><td>400</td></tr>
+  <tr><td>7</td><td>GET /tasks/:id — retrieves single task by ID</td><td>200</td></tr>
+  <tr><td>8</td><td>GET /auth/google/client-id — public config endpoint</td><td>200</td></tr>
+</table>
+
+<h3>Running Tests Locally</h3>
+<pre>npm test</pre>
+
+<h3>Local Test Results</h3>
+<pre>
+Test Suites: 2 passed, 2 total
+Tests:       22 passed, 22 total
+Time:        ~2.3s
+</pre>
+
+<div class="placeholder">
+  [SCREENSHOT 1: Local Test Success — Terminal showing "Tests: 22 passed, 22 total"]<br>
+  Save as: docs/practical-12/local-tests-passed.png
+</div>
+
+<h2>3. CI Failure and Recovery Demonstration</h2>
+<p>To demonstrate a real failed CI run followed by a passing run, the following procedure was used:</p>
+
+<h3>Step 1 — Introduce deliberate failure</h3>
+<p>In <code>tests/tasks.test.js</code>, the assertion was temporarily changed from the correct value to an incorrect one:</p>
+<pre>
+// Before (correct):
+expect(res.statusCode).toBe(200);
+
+// After (deliberate failure for CI demonstration):
+expect(res.statusCode).toBe(201);
+</pre>
+
+<h3>Step 2 — Push failure branch</h3>
+<pre>
+git checkout -b ci-failure-demo
+git add tests/tasks.test.js
+git commit -m "test: demonstrate deliberate CI pipeline failure"
+git push -u origin ci-failure-demo
+</pre>
+
+<h3>Step 3 — Capture failed run</h3>
+<div class="placeholder">
+  [SCREENSHOT 2: Failed GitHub Actions Pipeline — Red ❌ on test-backend job]<br>
+  Expected error: "Expected: 201, Received: 200"<br>
+  Save as: docs/practical-12/ci-failed.png<br>
+  URL: https://github.com/Aneri-1203/Task-Manager/actions
+</div>
+
+<h3>Step 4 — Restore correct assertion and push fix</h3>
+<pre>
+# Revert: expect(res.statusCode).toBe(200);
+git add tests/tasks.test.js
+git commit -m "fix: restore passing test assertion for CI verification"
+git push
+</pre>
+
+<h3>Step 5 — Capture passing run</h3>
+<div class="placeholder">
+  [SCREENSHOT 3: Passed GitHub Actions Pipeline — Green ✔️ on both jobs]<br>
+  Both test-backend and build-frontend jobs must show green<br>
+  Save as: docs/practical-12/ci-passed.png<br>
+  URL: https://github.com/Aneri-1203/Task-Manager/actions
+</div>
+
+<h2>4. CI Workflow YAML in Editor</h2>
+<div class="placeholder">
+  [SCREENSHOT 4: VS Code showing .github/workflows/ci.yml with both jobs visible]<br>
+  Save as: docs/practical-12/ci-workflow-yaml.png
+</div>
+
+<h2>5. GitHub Commit</h2>
+<div class="placeholder">
+  [SCREENSHOT 5: GitHub commit history showing CI-related commits on main branch]<br>
+  Repository: https://github.com/Aneri-1203/Task-Manager<br>
+  Save as: docs/practical-12/github-commit.png
+</div>
+
+<h2>Key Questions</h2>
+
+<h3>1. What is Continuous Integration (CI) and why is it important?</h3>
+<p>Continuous Integration (CI) is the practice of automatically building and testing code every time a developer pushes changes to a shared repository. It is important because it catches bugs early, ensures code quality, and prevents integration problems by validating every change against the full test suite before it reaches the main branch. In this project, GitHub Actions automatically runs all 22 API integration tests on every push to main, ensuring no broken code is merged.</p>
+
+<h3>2. What is the difference between CI (Continuous Integration) and CD (Continuous Deployment)?</h3>
+<p>CI automatically tests and validates code on every commit. CD (Continuous Deployment or Continuous Delivery) goes further by automatically deploying validated code to a staging or production environment. In this project, the pipeline implements CI — it tests and builds the application but does not automatically deploy it. Adding a deployment step (e.g., to a cloud service like Render or Railway) after the build step would complete the CD pipeline.</p>
+
+<h3>3. Why must the automated tests pass before the CI pipeline is considered successful?</h3>
+<p>The entire purpose of CI is to guarantee that every change maintains the application in a working state. If tests fail, it means the committed code has broken something. GitHub Actions exits with a nonzero status code when tests fail, marking the workflow run as failed. This prevents broken code from being merged and alerts the developer immediately. In this project, the deliberate failure demonstration shows exactly this — the wrong assertion caused the pipeline to fail, and fixing it restored the green status.</p>
+
+</body>
+</html>
